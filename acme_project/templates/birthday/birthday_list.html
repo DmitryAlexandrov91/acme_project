@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 
 {% block content %}
-  {% for birthday in birthdays %}
+  {% for birthday in page_obj %}
     <div class="row">
       <div class="col-1">
         {% if birthday.image %}
@@ -13,6 +13,7 @@
           {{ birthday.first_name  }} {{ birthday.last_name }} - {{ birthday.birthday }}
         </div>
         <div>
+          <a href="{% url 'birthday:detail' birthday.id %}">Инфо</a> |
           <a href="{% url 'birthday:edit' birthday.id %}">Изменить запись</a> | 
           <a href="{% url 'birthday:delete' birthday.id %}">Удалить запись</a>
         </div>
@@ -22,4 +23,5 @@
       {% endif %}
     </div>
   {% endfor %}
+  {% include "includes/paginator.html" %}
 {% endblock %}
