@@ -13,10 +13,46 @@
           {{ birthday.first_name  }} {{ birthday.last_name }} - {{ birthday.birthday }}
         </div>
         <div>
-          <a href="{% url 'birthday:detail' birthday.id %}">Инфо</a> |
-          <a href="{% url 'birthday:edit' birthday.id %}">Изменить запись</a> | 
-          <a href="{% url 'birthday:delete' birthday.id %}">Удалить запись</a>
+          <!-- Тег spaceless убирает из строки лишние пробелы 
+            и переводы строк -->
+          {% spaceless %}
+            {% comment %} <!-- Цикл по тегам записи -->
+            {% for tag in birthday.tags.all %}
+              <!-- Если работаем с первым элементом цикла... -->
+              {% if forloop.first %}
+                <!-- ...выводим название тега с заглавной буквы -->
+                <span>{{ tag.tag|title }}</span>
+              {% else %}
+                <!-- Если элемент не первый — пишем тег с маленькой буквы -->
+                <span>{{ tag.tag|lower }}</span>
+              {% endif %}
+              <!-- Если обрабатываем не последний элемент цикла... -->
+              {% if not forloop.last %}
+                <!-- ...после него ставим запятую с пробелом -->
+                <span>, </span>
+              {% else %}
+                <!-- После последнего элемента выводим username пользователя -->
+                пользователя {{ birthday.author.username }}
+              {% endif %}
+            {% endfor %} {% endcomment %}
+            {% with all_tags=birthday.tags.all %}
+            <!-- Если у записи есть хоть один тег -->
+              {% if all_tags %}
+                <!-- Выводим теги через запятую, самую первую букву делаем заглавной -->
+                {{ all_tags|join:", "|lower|capfirst }} 
+                <!-- Также выводим username пользователя -->
+                пользователя {{ birthday.author.username }}
+              {% endif %}
+            {% endwith %}
+          {% endspaceless %}
         </div>
+        <div>
+          <a href="{% url 'birthday:detail' birthday.id %}">Инфо</a> 
+          {% if birthday.author == user or user.is_superuser %}
+            | <a href="{% url 'birthday:edit' birthday.id %}">Изменить запись</a> | 
+            <a href="{% url 'birthday:delete' birthday.id %}">Удалить запись</a>
+          {% endif %} 
+        </div>   
       </div>
       {% if not forloop.last %}
         <hr class="mt-3">
